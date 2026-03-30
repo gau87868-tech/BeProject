@@ -1,0 +1,224 @@
+{
+  "data": [
+    {
+      "company": "Tata Consultancy Services (TCS)",
+      "role": "Java",
+      "questions": [
+        { "questionId": "TCSJ01", "question": "Tell me about yourself and your journey in Java development so far." },
+        { "questionId": "TCSJ02", "question": "What are the main features of Java that make it platform-independent and secure?" },
+        { "questionId": "TCSJ03", "question": "Explain the four main pillars of Object-Oriented Programming with examples." },
+        { "questionId": "TCSJ04", "question": "What is the difference between method overloading and method overriding?" },
+        { "questionId": "TCSJ05", "question": "What is the difference between abstract class and interface in Java?" },
+        { "questionId": "TCSJ06", "question": "What is encapsulation? How does Java achieve it?" },
+        { "questionId": "TCSJ07", "question": "What are the main differences between ArrayList and LinkedList?" },
+        { "questionId": "TCSJ08", "question": "Explain the difference between HashMap and TreeMap." },
+        { "questionId": "TCSJ09", "question": "How does Java’s HashMap internally work?" },
+        { "questionId": "TCSJ10", "question": "What is the difference between checked and unchecked exceptions?" },
+        { "questionId": "TCSJ11", "question": "What is the use of the finally block in exception handling?" },
+        { "questionId": "TCSJ12", "question": "Explain Garbage Collection in Java. How can it be requested programmatically?" },
+        { "questionId": "TCSJ13", "question": "What are the two ways to create a thread in Java? Which one is preferred and why?" },
+        { "questionId": "TCSJ14", "question": "Explain the concept of synchronization in Java and how it prevents data inconsistency." },
+        { "questionId": "TCSJ15", "question": "What is the difference between JDK, JRE, and JVM?" },
+        { "questionId": "TCSJ16", "question": "Write a simple Java program to check if a given number is a prime number." }
+      ]
+    },
+    {
+      "company": "Tata Consultancy Services (TCS)",
+      "role": "JavaScript",
+      "questions": [
+        { "questionId": "TCSJS01", "question": "Tell me about yourself and your journey in JavaScript development so far." },
+        { "questionId": "TCSJS02", "question": "What are the main features of JavaScript that make it a versatile language?" },
+        { "questionId": "TCSJS03", "question": "Explain the difference between var, let, and const in JavaScript." },
+        { "questionId": "TCSJS04", "question": "What is hoisting in JavaScript?" },
+        { "questionId": "TCSJS05", "question": "What are arrow functions and how are they different from regular functions?" },
+        { "questionId": "TCSJS06", "question": "Explain the concept of closures in JavaScript with an example." },
+        { "questionId": "TCSJS07", "question": "What is the difference between == and === in JavaScript?" },
+        { "questionId": "TCSJS08", "question": "What are promises and async/await in JavaScript?" },
+        { "questionId": "TCSJS09", "question": "Explain event bubbling and event capturing in JavaScript." },
+        { "questionId": "TCSJS10", "question": "What is the difference between synchronous and asynchronous programming?" },
+        { "questionId": "TCSJS11", "question": "What is the use of the 'this' keyword in JavaScript?" },
+        { "questionId": "TCSJS12", "question": "What is the difference between deep copy and shallow copy in JavaScript?" },
+        { "questionId": "TCSJS13", "question": "Explain the concept of prototypal inheritance in JavaScript." },
+        { "questionId": "TCSJS14", "question": "What is the purpose of JavaScript modules (import/export)?" },
+        { "questionId": "TCSJS15", "question": "What is the use of setTimeout and setInterval functions?" },
+        { "questionId": "TCSJS16", "question": "Write a JavaScript program to find the factorial of a number." }
+      ]
+    },
+    {
+      "company": "Tata Consultancy Services (TCS)",
+      "role": "Frontend Developer",
+      "questions": [
+        { "questionId": "TCSFE01", "question": "Tell me about yourself and your journey in Frontend development so far." },
+        { "questionId": "TCSFE02", "question": "What are the main differences between HTML, CSS, and JavaScript?" },
+        { "questionId": "TCSFE03", "question": "Explain the concept of the Document Object Model (DOM)." },
+        { "questionId": "TCSFE04", "question": "What are semantic HTML elements and why are they important?" },
+        { "questionId": "TCSFE05", "question": "Explain the difference between inline, internal, and external CSS." },
+        { "questionId": "TCSFE06", "question": "What is the difference between Flexbox and CSS Grid?" },
+        { "questionId": "TCSFE07", "question": "What are media queries and how do they help in responsive design?" },
+        { "questionId": "TCSFE08", "question": "Explain the concept of the box model in CSS." },
+        { "questionId": "TCSFE09", "question": "What is the difference between relative, absolute, and fixed positioning in CSS?" },
+        { "questionId": "TCSFE10", "question": "What is React.js and why is it widely used for frontend development?" },
+        { "questionId": "TCSFE11", "question": "Explain the difference between functional and class components in React." },
+        { "questionId": "TCSFE12", "question": "What are React hooks? Give examples of commonly used hooks." },
+        { "questionId": "TCSFE13", "question": "What is the purpose of the Virtual DOM in React?" },
+        { "questionId": "TCSFE14", "question": "What is state and props in React, and how do they differ?" },
+        { "questionId": "TCSFE15", "question": "What is the difference between SPA (Single Page Application) and MPA?" },
+        { "questionId": "TCSFE16", "question": "Write a simple React component that displays a list of items." }
+      ]
+    },
+    {
+      "company": "Tata Consultancy Services (TCS)",
+      "role": ".NET Developer",
+      "questions": [
+        { "questionId": "TCSDN01", "question": "Tell me about yourself and your journey in .NET development so far." },
+        { "questionId": "TCSDN02", "question": "What is the .NET Framework and how does it work?" },
+        { "questionId": "TCSDN03", "question": "What are the main differences between .NET Framework, .NET Core, and .NET 5/6?" },
+        { "questionId": "TCSDN04", "question": "What is the Common Language Runtime (CLR)?" },
+        { "questionId": "TCSDN05", "question": "Explain the concept of managed and unmanaged code in .NET." },
+        { "questionId": "TCSDN06", "question": "What is the difference between value types and reference types in C#?" },
+        { "questionId": "TCSDN07", "question": "What are constructors and destructors in C#?" },
+        { "questionId": "TCSDN08", "question": "What is the difference between abstract classes and interfaces in C#?" },
+        { "questionId": "TCSDN09", "question": "What is the purpose of the 'using' statement in C#?" },
+        { "questionId": "TCSDN10", "question": "Explain exception handling in C# with try, catch, and finally." },
+        { "questionId": "TCSDN11", "question": "What is the difference between IEnumerable and ICollection?" },
+        { "questionId": "TCSDN12", "question": "What is LINQ in C# and why is it used?" },
+        { "questionId": "TCSDN13", "question": "What is Entity Framework and how does it simplify database operations?" },
+        { "questionId": "TCSDN14", "question": "What are delegates and events in C#?" },
+        { "questionId": "TCSDN15", "question": "What is ASP.NET MVC and how does it differ from ASP.NET Core?" },
+        { "questionId": "TCSDN16", "question": "Write a C# program to check whether a number is even or odd." }
+      ]
+    },
+    {
+      "company": "Capgemini",
+      "role": "Java",
+      "questions": [
+        { "questionId": "CAPJ01", "question": "Tell me about yourself and your journey in Java development so far." },
+        { "questionId": "CAPJ02", "question": "What are the key features of Java that make it platform-independent?" },
+        { "questionId": "CAPJ03", "question": "Explain the concept of Object-Oriented Programming in Java with examples." },
+        { "questionId": "CAPJ04", "question": "What is the difference between method overloading and method overriding?" },
+        { "questionId": "CAPJ05", "question": "What are interfaces in Java and how are they different from abstract classes?" },
+        { "questionId": "CAPJ06", "question": "Explain encapsulation and its benefits in Java applications." },
+        { "questionId": "CAPJ07", "question": "What is the difference between ArrayList, LinkedList, and Vector?" },
+        { "questionId": "CAPJ08", "question": "How does Java handle memory management and garbage collection?" },
+        { "questionId": "CAPJ09", "question": "Explain the working of HashMap in Java and how collisions are handled." },
+        { "questionId": "CAPJ10", "question": "What is the difference between checked and unchecked exceptions in Java?" },
+        { "questionId": "CAPJ11", "question": "What are threads in Java? How do you create and manage them?" },
+        { "questionId": "CAPJ12", "question": "Explain synchronization in Java and why it’s needed in multithreaded programs." },
+        { "questionId": "CAPJ13", "question": "What is the difference between JDK, JRE, and JVM?" },
+        { "questionId": "CAPJ14", "question": "What are lambda expressions in Java? Give an example." },
+        { "questionId": "CAPJ15", "question": "Explain the use of Stream API in Java 8 with an example." },
+        { "questionId": "CAPJ16", "question": "Write a Java program to reverse a string without using built-in functions." }
+      ]
+    },
+    {
+      "company": "Capgemini",
+      "role": "JavaScript",
+      "questions": [
+        { "questionId": "CAPJS01", "question": "Tell me about yourself and your journey in JavaScript development so far." },
+        { "questionId": "CAPJS02", "question": "Explain the concept of hoisting in JavaScript." },
+        { "questionId": "CAPJS03", "question": "What is the difference between let, const, and var?" },
+        { "questionId": "CAPJS04", "question": "What are closures in JavaScript?" },
+        { "questionId": "CAPJS05", "question": "What are promises and how do they differ from callbacks?" },
+        { "questionId": "CAPJS06", "question": "What is the difference between synchronous and asynchronous programming?" },
+        { "questionId": "CAPJS07", "question": "What are template literals and when should they be used?" },
+        { "questionId": "CAPJS08", "question": "Explain destructuring assignment in JavaScript." },
+        { "questionId": "CAPJS09", "question": "What are ES6 modules and why are they important?" },
+        { "questionId": "CAPJS10", "question": "What is the difference between deep copy and shallow copy in JavaScript?" },
+        { "questionId": "CAPJS11", "question": "Explain the concept of event loop in JavaScript." },
+        { "questionId": "CAPJS12", "question": "What is async/await and how does it simplify asynchronous code?" },
+        { "questionId": "CAPJS13", "question": "What are higher-order functions in JavaScript?" },
+        { "questionId": "CAPJS14", "question": "Explain the purpose of arrow functions in ES6." },
+        { "questionId": "CAPJS15", "question": "What are generators in JavaScript?" },
+        { "questionId": "CAPJS16", "question": "Write a program to check if a string is a palindrome in JavaScript." }
+      ]
+    },
+    {
+      "company": "Capgemini",
+      "role": "Cloud",
+      "questions": [
+        { "questionId": "CAPC01", "question": "Tell me about yourself and your journey in cloud computing so far." },
+        { "questionId": "CAPC02", "question": "What is cloud computing and what are its main service models?" },
+        { "questionId": "CAPC03", "question": "Explain the difference between IaaS, PaaS, and SaaS with examples." },
+        { "questionId": "CAPC04", "question": "What are public, private, and hybrid cloud models?" },
+        { "questionId": "CAPC05", "question": "What is virtualization and why is it important in cloud computing?" },
+        { "questionId": "CAPC06", "question": "What are containers and how do they differ from virtual machines?" },
+        { "questionId": "CAPC07", "question": "Explain what AWS, Azure, and Google Cloud are used for." },
+        { "questionId": "CAPC08", "question": "What is auto-scaling and how does it help in cloud cost optimization?" },
+        { "questionId": "CAPC09", "question": "Explain the concept of serverless computing." },
+        { "questionId": "CAPC10", "question": "What are IAM roles and policies in cloud environments?" },
+        { "questionId": "CAPC11", "question": "What is load balancing in cloud infrastructure?" },
+        { "questionId": "CAPC12", "question": "Explain the concept of cloud storage and its types." },
+        { "questionId": "CAPC13", "question": "What are some best practices for securing cloud-based applications?" },
+        { "questionId": "CAPC14", "question": "What is the shared responsibility model in cloud security?" },
+        { "questionId": "CAPC15", "question": "Explain how CI/CD pipelines are integrated into cloud environments." },
+        { "questionId": "CAPC16", "question": "What is Kubernetes and why is it used for container orchestration?" }
+      ]
+    },
+    {
+      "company": "Capgemini",
+      "role": "AI",
+      "questions": [
+        { "questionId": "CAPAI01", "question": "Tell me about yourself and your experience in Artificial Intelligence." },
+        { "questionId": "CAPAI02", "question": "What are the main branches of AI?" },
+        { "questionId": "CAPAI03", "question": "What is the difference between supervised and unsupervised learning?" },
+        { "questionId": "CAPAI04", "question": "Explain the concept of machine learning and its real-world applications." },
+        { "questionId": "CAPAI05", "question": "What is deep learning and how does it differ from traditional ML?" },
+        { "questionId": "CAPAI06", "question": "What are neural networks and how do they work?" },
+        { "questionId": "CAPAI07", "question": "Explain overfitting and underfitting in ML models." },
+        { "questionId": "CAPAI08", "question": "What are activation functions in neural networks?" },
+        { "questionId": "CAPAI09", "question": "What is natural language processing (NLP)?" },
+        { "questionId": "CAPAI10", "question": "What is computer vision and where is it used?" },
+        { "questionId": "CAPAI11", "question": "Explain the concept of reinforcement learning with an example." },
+        { "questionId": "CAPAI12", "question": "What are confusion matrices and precision-recall in ML?" },
+        { "questionId": "CAPAI13", "question": "What is the difference between AI, ML, and DL?" },
+        { "questionId": "CAPAI14", "question": "What are some common Python libraries used for AI?" },
+        { "questionId": "CAPAI15", "question": "Explain transfer learning in AI." },
+        { "questionId": "CAPAI16", "question": "Write a Python function that predicts output from a trained AI model." }
+      ]
+    },
+    {
+      "company": "Barclays",
+      "role": "Frontend Developer",
+      "questions": [
+        { "questionId": "BARFE01", "question": "Tell me about yourself and your journey in Frontend development so far." },
+        { "questionId": "BARFE02", "question": "What are the key differences between HTML, CSS, and JavaScript?" },
+        { "questionId": "BARFE03", "question": "What are semantic HTML elements and why are they important for accessibility?" },
+        { "questionId": "BARFE04", "question": "Explain how the DOM works and how JavaScript interacts with it." },
+        { "questionId": "BARFE05", "question": "What is the difference between Flexbox and Grid in CSS?" },
+        { "questionId": "BARFE06", "question": "How do you optimize the performance of a frontend application?" },
+        { "questionId": "BARFE07", "question": "What are React hooks? Explain useState and useEffect with examples." },
+        { "questionId": "BARFE08", "question": "What is the purpose of Redux or other state management libraries?" },
+        { "questionId": "BARFE09", "question": "What is the Virtual DOM in React?" },
+        { "questionId": "BARFE10", "question": "Explain lazy loading and code splitting in React applications." },
+        { "questionId": "BARFE11", "question": "What is the difference between server-side rendering (SSR) and client-side rendering (CSR)?" },
+        { "questionId": "BARFE12", "question": "What are web components and why are they useful?" },
+        { "questionId": "BARFE13", "question": "What are Progressive Web Apps (PWA) and their benefits?" },
+        { "questionId": "BARFE14", "question": "How do you ensure accessibility (a11y) in your frontend projects?" },
+        { "questionId": "BARFE15", "question": "Explain the concept of responsive design and mobile-first development." },
+        { "questionId": "BARFE16", "question": "Write a React component that fetches data from an API and displays it." }
+      ]
+    },
+    {
+      "company": "Barclays",
+      "role": "Backend Developer",
+      "questions": [
+        { "questionId": "BARBE01", "question": "Tell me about yourself and your journey as a backend developer so far." },
+        { "questionId": "BARBE02", "question": "What is the difference between monolithic and microservices architecture?" },
+        { "questionId": "BARBE03", "question": "Explain RESTful APIs and how they work." },
+        { "questionId": "BARBE04", "question": "What are HTTP methods and their purposes?" },
+        { "questionId": "BARBE05", "question": "What is the difference between authentication and authorization?" },
+        { "questionId": "BARBE06", "question": "Explain the concept of middleware in backend frameworks." },
+        { "questionId": "BARBE07", "question": "What is caching and how does it improve performance?" },
+        { "questionId": "BARBE08", "question": "Explain the difference between SQL and NoSQL databases." },
+        { "questionId": "BARBE09", "question": "What is connection pooling and why is it used?" },
+        { "questionId": "BARBE10", "question": "What is ORM (Object-Relational Mapping) and how does it help developers?" },
+        { "questionId": "BARBE11", "question": "Explain how JWT (JSON Web Token) works for authentication." },
+        { "questionId": "BARBE12", "question": "What are web sockets and how are they used in real-time applications?" },
+        { "questionId": "BARBE13", "question": "Explain error handling best practices in backend development." },
+        { "questionId": "BARBE14", "question": "What is Docker and how is it used in backend deployment?" },
+        { "questionId": "BARBE15", "question": "What are CI/CD pipelines and how do they help in backend development?" },
+        { "questionId": "BARBE16", "question": "Write an example API endpoint in Node.js that returns a list of users." }
+      ]
+    }
+  ]
+}

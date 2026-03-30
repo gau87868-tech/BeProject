@@ -1,0 +1,49 @@
+/* Interview Container */
+.interview-container {
+  @apply max-w-3xl mx-auto p-8 bg-white rounded-2xl shadow-lg mt-12;
+}
+
+/* Question Display */
+.question-box {
+  @apply my-6 p-6 bg-gray-100 rounded-lg min-h-[120px] text-lg font-semibold;
+}
+
+/* Answer Display */
+.answer-box {
+  @apply my-4 p-4 bg-gray-50 rounded-lg border border-gray-300 min-h-[100px] text-gray-800;
+}
+
+/* Progress Indicator */
+.progress-bar {
+  @apply w-full h-3 bg-gray-200 rounded-full mb-6;
+}
+.progress-bar-fill {
+  @apply h-3 bg-blue-600 rounded-full transition-all duration-500;
+}
+
+/* Recording Button */
+.record-btn {
+  @apply px-8 py-6 rounded-full text-white font-bold transition-all;
+}
+.record-btn-idle {
+  @apply bg-blue-600 hover:bg-blue-700;
+}
+.record-btn-active {
+  @apply bg-red-500 animate-pulse;
+}
+
+/* Navigation Controls */
+.nav-controls {
+  @apply flex justify-between mt-6;
+}
+
+/* Start / Completion Screen */
+.screen-center {
+  @apply h-screen flex flex-col items-center justify-center;
+}
+.start-btn {
+  @apply px-8 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700;
+}
+.complete-check {
+  @apply text-green-600 mb-4;
+}

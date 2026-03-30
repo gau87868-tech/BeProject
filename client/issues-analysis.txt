@@ -1,0 +1,58 @@
+AI Interviewer Project — Issues Analysis
+
+Folders analyzed:
+- Ai_Interviewer-backend (Node.js/Express/Mongoose)
+- ai-interviewer (React/Vite)
+
+Backend Issues (Ai_Interviewer-backend):
+- Missing environment file: server expects `config.env` with `MONGO_CONN_STR` and `JWT_SECRET_STRING` (server.js:3, server.js:8, src/Controllers/authController.js:7,33).
+- Start script mismatch: `package.json` uses `nodemon index.js` but no `index.js` exists; main is `server.js` (package.json:5-8).
+- Vercel serverless mismatch: `vercel.json` builds `server.js` with `@vercel/node`, while `server.js` calls `server.listen(3000)`; serverless functions should export a handler, not listen on a port (vercel.json:3-13, server.js:18-20).
+- CORS restricted: only `http://localhost:5173` allowed; production frontend domain not whitelisted (app.js:9-24).
+- Unnecessary `next()` after `res.send` on root route; can cause headers/already-sent issues (app.js:32-38).
+- Auth controller problems:
+  - `jwtToken()` returns only accessToken; refreshToken created but unused (src/Controllers/authController.js:6-13).
+  - `signUp` computes token using `userCreated.id` where `userCreated` is an array; should use `createdUser.id` or `userCreated[0]lers/auth.id` (src/ControlController.js:51-55).
+  - `signUp` responds with `token`, but frontend expects `accessToken` (src/Controllers/authController.js:56-60).
+  - Redundant `await createdUser.save()` after `User.create` (src/Controllers/authController.js:51-53).
+  - `validateToken` mixes boolean returns with HTTP response and misspells `status` as `stauts` (src/Controllers/authController.js:27-31,42-45).
+- Answers controller:
+  - Retrieves answers only by `candidate`, ignoring `questionSetId` (src/Controllers/answersController.js:27-28).
+  - Console logging in production (src/Controllers/answersController.js:29,37).
+  - Fallback mapping uses first question when `questionId` not found, risking incorrect pairings (src/Controllers/answersController.js:33-41).
+  - Missing null checks if `answer` or `questionSet` not found.
+- Mongoose schema vs payload: backend requires `answers` as objects with `questionId` and `answer`, but frontend may send empty strings (src/Model/answersModel.js:13-22).
+- `buyCredits` endpoint unimplemented (src/Controllers/userController.js:6-12) and no route exists for it.
+- Test script configured (`jest`) but no Jest dependency present (package.json:6).
+- DB connection mixes `await` with `.then/.catch`; simpler `await`/`try-catch` is preferred (server.js:6-13).
+
+Frontend Issues (ai-interviewer):
+- Bad URL constant: leading space breaks `ALL_COMPANIES_URL` (src/utils/constants.js:3).
+- Props vs args mismatch when starting interview:
+  - Dashboard calls `onSelect(company.slug, company.companyName, company.role)` (src/components/Dashboard/Dashboard.jsx:108-113).
+  - App’s `handleSelectRole` only accepts two args and forwards two, so `selectedRole` becomes `undefined` (src/App.jsx:49-64).
+- BuyCredits modal uses `closeModal` from AuthContext, but it’s a prop and not provided by context; component also ignores the passed prop (src/components/Dashboard/BuyCreditsModal.jsx:7-12, src/App.jsx:74-76).
+- Completion screen does not await the API call; `result` is a Promise, so save never succeeds (src/components/Interview/CompletionScreen.jsx:23-31).
+- Review page fetch runs on mount even if `user`/`dbQuestions` aren’t loaded, producing invalid URL segments (src/components/Interview/ReviewPage.jsx:16-25,42-44).
+- Interview container reads `credits` from InterviewContext, but context doesn’t provide it (src/components/Interview/InterviewContainer.jsx:15-22).
+- Question display assumes object shape; shows blank when questions are plain strings (src/components/Interview/QuestionDisplay.jsx:6-12).
+- Navigation controls:
+  - Destructures `QUESTIONS` from context though it’s not provided (src/components/Interview/NavigationControls.jsx:7).
+  - Hard-codes completion button visibility to index 15; may not match `questionSet.length` (src/components/Interview/NavigationControls.jsx:22-28).
+- Interview context:
+  - `answers` initialized as strings; backend expects objects and will reject empty string entries (src/context/InterviewContext.jsx:13,51-59).
+  - Loader state named `loadding` (typo) and used inconsistently (src/context/InterviewContext.jsx:9,98-100).
+- Inconsistent token storage: login uses `localStorage`, signup uses `sessionStorage` (src/components/Auth/LoginForm.jsx:64, src/components/Auth/SignupForm.jsx:65-67).
+- Overly strict email validation to Gmail-only addresses (src/components/Auth/LoginForm.jsx:24, src/components/Auth/SignupForm.jsx:35).
+
+Recommended Fixes (summary):
+- Add `config.env` with required secrets locally; configure envs on Vercel; avoid logging secrets.
+- Update backend `start` script to `node server.js` or `nodemon server.js` and consider Express/Vercel deployment model (do not call `listen` in serverless builds).
+- Expand CORS `allowedOrigins` using environment configuration; remove `next()` after `res.send`.
+- In `authController.signUp`, fix token generation to use a single user object and respond with `accessToken`; remove redundant save; correct typos.
+- In answers flow, query by both `candidate` and `questionSetId`; add null checks; remove console logs; avoid fallback to index 0.
+- In frontend, fix `ALL_COMPANIES_URL` whitespace; align `handleSelectRole` signature; pass `closeModal` via props to `BuyCreditsModal` or expose it via context; `await` the save call in `CompletionScreen`.
+- Guard `ReviewPage` fetch until both user ID and question set ID exist.
+- Provide credits via context to `InterviewContainer` or read from AuthContext; make `QuestionDisplay` handle both string and object questions; drive completion button from `questionSet.length`.
+- Initialize `answers` as objects with default `questionId` and empty `answer` to match backend schema.
+- Normalize token storage (choose `localStorage` or `sessionStorage`).

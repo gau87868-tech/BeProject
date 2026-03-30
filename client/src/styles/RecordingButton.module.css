@@ -1,0 +1,22 @@
+.button {
+  @apply mt-4 px-6 py-3 rounded-full text-white font-semibold transition-all;
+}
+.idle {
+  @apply bg-blue-600 hover:bg-blue-700;
+}
+.recording {
+  @apply bg-red-500;
+  animation: pulse 1s infinite;
+}
+.processing {
+  @apply bg-yellow-500;
+}
+.completed {
+  @apply bg-green-600;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
