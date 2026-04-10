@@ -19,6 +19,14 @@ router.post("/create", validateOrgToken, interviewController.createInterview);
 router.post("/:id/invite", validateOrgToken, interviewController.inviteStudents);
 
 /**
+ * @route   GET /api/v2/interview/list
+ * @desc    Get all interviews for logged-in organization
+ * @access  Private
+ */
+router.get("/list", validateOrgToken, interviewController.getInterviews);
+
+
+/**
  * @route   POST /api/v2/interview/submit
  * @desc    Submit interview answers
  * @access  Public

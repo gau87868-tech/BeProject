@@ -12,6 +12,9 @@ exports.validatePassword = (password) => {
     return password && password.length >= 6;
 };
 
+//  Bug #2 FIXED: confirmPassword check is now conditional
+// Frontend strips confirmPassword from payload (validates client-side)
+// so we only check it if it was actually sent
 exports.validateOrgSignup = (req, res, next) => {
     const { companyName, companyEmail, password, confirmPassword } = req.body;
 
@@ -36,7 +39,8 @@ exports.validateOrgSignup = (req, res, next) => {
         });
     }
 
-    if (password !== confirmPassword) {
+    // Only check confirmPassword if it was actually sent
+    if (confirmPassword !== undefined && password !== confirmPassword) {
         return res.status(400).json({
             status: 'fail',
             message: 'Passwords do not match'

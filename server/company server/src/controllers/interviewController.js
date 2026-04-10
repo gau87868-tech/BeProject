@@ -5,9 +5,11 @@ const { generateInviteToken, verifyInviteToken } = require("../utils/tokenUtils"
 const { sendInterviewInvite } = require("../utils/emailService");
 const { asyncHandler } = require("../middleware/errorHandler");
 
+// ✅ Bug #6 FIXED: Changed interviewModel.create → Interview.create
 exports.createInterview = async(req,res)=>{
     try {
-        const createdInterview = await interviewModel.create(req.body);
+        req.body.organizationId = req.organization.id;
+        const createdInterview = await Interview.create(req.body);
         if(createdInterview){
             res.status(201).json({
                 status : "success",
@@ -17,18 +19,41 @@ exports.createInterview = async(req,res)=>{
         }
     } catch (error) {
         res.status(400).json({
-                status : "fail",
-                message : error.message
-            })
+            status : "fail",
+            message : error.message
+        })
     }
 }
 
+exports.getInterviews = async (req, res) => {
+    try {
+        const organizationId = req.organization.id;
+        const interviews = await Interview.find({ organizationId })
+            .sort({ createdAt: -1 });
 
+        return res.status(200).json({
+            status: "success",
+            count: interviews.length,
+            data: interviews
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: "fail",
+            message: error.message
+        });
+    }
+};
+
+
+//  Bug #7 FIXED: Changed interviewModel.findById → Interview.findById
+//  Bug #8 FIXED: Changed sendInviteEmail → sendInterviewInvite
+//  Bug #9 FIXED: Read interviewId from req.params.id instead of req.body
 exports.inviteStudents = async (req,res)=>{
     try {
-        const {interviewId,emails} = req.body;
+        const interviewId = req.params.id;
+        const { emails } = req.body;
         
-        const interview = await interviewModel.findById(interviewId);
+        const interview = await Interview.findById(interviewId);
         if(!interview){
             return res.status(404).json({
                 status : "fail",
@@ -43,18 +68,16 @@ exports.inviteStudents = async (req,res)=>{
             })
         }
         for (const email of emails) {
-           
-
             const token = generateInviteToken();
             const inviteLink = `${process.env.FRONTEND_URL}/interview/join/${token}`;
 
             interview.invitedStudents.push({
-            email,
-            inviteToken: token,
-            invitedAt: new Date()
+                email,
+                inviteToken: token,
+                invitedAt: new Date()
             });
 
-            await sendInviteEmail(email, inviteLink);
+            await sendInterviewInvite(email, inviteLink);
         }
 
         await interview.save();
@@ -67,114 +90,111 @@ exports.inviteStudents = async (req,res)=>{
         
     } catch (error) {
         res.status(400).json({
-                status : "fail",
-                message : error.message
-            })
+            status : "fail",
+            message : error.message
+        })
     }
 }
 
 
 exports.submitInterview = async (req, res) => {
-  try {
-    const {
-      interviewId,
-      candidateId,
-      organizationId,
-      answers
-    } = req.body;
+    try {
+        const {
+            interviewId,
+            candidateId,
+            organizationId,
+            answers
+        } = req.body;
 
+        const result = await Result.create({
+            interviewId,
+            organizationId,
+            candidateId,
+            answers,
+            status: "SUBMITTED"
+        });
 
-    // Create result (NO AI evaluation yet)
-    const result = await Result.create({
-      interviewId,
-      organizationId,
-      candidateId,
-      answers,
-      status: "SUBMITTED"
-    });
+        return res.status(201).json({
+            status: "success",
+            message: "Interview submitted successfully",
+            resultId: result._id
+        });
 
-    return res.status(201).json({
-      status: "success",
-      message: "Interview submitted successfully",
-      resultId: result._id
-    });
+    } catch (error) {
+        if (error.code === 11000) {
+            return res.status(409).json({
+                status: "fail",
+                message: "Interview already submitted"
+            });
+        }
 
-  } catch (error) {
-
-    // Prevent duplicate submission
-    if (error.code === 11000) {
-      return res.status(409).json({
-        status: "fail",
-        message: "Interview already submitted"
-      });
+        return res.status(400).json({
+            status: "fail",
+            message: error.message
+        });
     }
-
-    return res.status(400).json({
-      status: "fail",
-      message: error.message
-    });
-  }
 };
 
-
+//  Bug #12 FIXED: Changed req.user.id → req.organization.id (set by validateOrgToken)
 exports.getInterviewResults = async (req, res) => {
-  try {
-    const { interviewId } = req.params;
-    const organizationId = req.user.id; // org logged in
+    try {
+        const { interviewId } = req.params;
+        const organizationId = req.organization.id;
 
-    const results = await Result.find({
-      interviewId,
-      organizationId
-    })
-      .populate("candidateId", "name email")
-      .select(
-        "candidateId aiScore recommendation status completedAt"
-      )
-      .sort({ completedAt: -1 });
+        const results = await Result.find({
+            interviewId,
+            organizationId
+        })
+            .populate("candidateId", "name email")
+            .select(
+                "candidateId aiScore recommendation status completedAt"
+            )
+            .sort({ completedAt: -1 });
 
-    return res.status(200).json({
-      status: "success",
-      count: results.length,
-      data: results
-    });
+        return res.status(200).json({
+            status: "success",
+            count: results.length,
+            data: results
+        });
 
-  } catch (error) {
-    return res.status(500).json({
-      status: "fail",
-      message: error.message
-    });
-  }
+    } catch (error) {
+        return res.status(500).json({
+            status: "fail",
+            message: error.message
+        });
+    }
 };
 
+//  Bug #14 FIXED: Changed req.user.id → req.organization.id (set by validateOrgToken)
 exports.getResultById = async (req, res) => {
-  try {
-    const { resultId } = req.params;
-    const organizationId = req.user.id;
+    try {
+        const { resultId } = req.params;
+        const organizationId = req.organization.id;
 
-    const result = await Result.findOne({
-      _id: resultId,
-      organizationId
-    })
-      .populate("candidateId", "name email")
-      .populate("interviewId", "title role")
-      .populate("answers.questionId", "questionText");
+        const result = await Result.findOne({
+            _id: resultId,
+            organizationId
+        })
+            .populate("candidateId", "name email")
+            .populate("interviewId", "title role")
+            .populate("answers.questionId", "questionText");
 
-    if (!result) {
-      return res.status(404).json({
-        status: "fail",
-        message: "Result not found"
-      });
+        if (!result) {
+            return res.status(404).json({
+                status: "fail",
+                message: "Result not found"
+            });
+        }
+
+        return res.status(200).json({
+            status: "success",
+            data: result
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            status: "fail",
+            message: error.message
+        });
     }
-
-    return res.status(200).json({
-      status: "success",
-      data: result
-    });
-
-  } catch (error) {
-    return res.status(500).json({
-      status: "fail",
-      message: error.message
-    });
-  }
 };

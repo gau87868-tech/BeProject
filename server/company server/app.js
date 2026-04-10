@@ -11,7 +11,7 @@ const { errorHandler } = require('./src/middleware/errorHandler');
 
 // Middleware
 app.use(cors({
-    origin: ["http://localhost:5173", "http://localhost:3000"],
+    origin: ["http://localhost:5173", "http://localhost:3000","http://localhost:5174"],
     credentials: true
 }));
 
@@ -32,9 +32,17 @@ app.get('/health', (req, res) => {
 });
 
 // Routes
-app.use("/api/v2/organization", orgRouter);
+app.use("/api/v2/organization/", orgRouter);
+
+// // DEBUG: Add a direct test route
+// app.post("/api/v2/test-register", (req, res) => {
+//     res.json({ status: "success", message: "Direct route works!" });
+// });
+
 app.use("/api/v2/interview", interviewRouter);
-app.use("/api/v2/questions", validateOrgToken, questionRouter);
+
+//  Bug #13 FIXED: Removed validateOrgToken here — it's already on each individual route in questionRoute.js
+app.use("/api/v2/questions", questionRouter);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -50,6 +58,28 @@ app.get('/', (req, res) => {
     });
 });
 
+// app.get('/debug-routes', (req, res) => {
+//     const routes = [];
+//     if (orgRouter && orgRouter.stack) {
+//         orgRouter.stack.forEach((layer) => {
+//             if (layer.route) {
+//                 routes.push({
+//                     path: layer.route.path,
+//                     methods: Object.keys(layer.route.methods)
+//                 });
+//             }
+//         });
+//     }
+//     res.json({ 
+//         expressVersion: require('express/package.json').version,
+//         orgRouterRoutes: routes,
+//         testMount: "checking"
+//     });
+// });
+
+
+
+
 // 404 handling
 app.use((req, res) => {
     res.status(404).json({
@@ -62,4 +92,3 @@ app.use((req, res) => {
 app.use(errorHandler);
 
 module.exports = app;
-

@@ -15,76 +15,86 @@ function jwtToken(userId){
 }
 
 exports.validateToken = async (req, res, next) => {
-  try {
-    const authHeader = req.headers.authorization;
-    let token;
+    try {
+        const authHeader = req.headers.authorization;
+        let token;
 
-    // Extract token
-    if (authHeader && authHeader.startsWith("Bearer ")) {
-      token = authHeader.split(" ")[1];
+        if (authHeader && authHeader.startsWith("Bearer ")) {
+            token = authHeader.split(" ")[1];
+        }
+
+        if (!token) {
+            return res.status(401).json({
+                status: "fail",
+                message: "Authorization token missing"
+            });
+        }
+
+        const decoded = jwt.verify(
+            token,
+            process.env.JWT_SECRET_STRING
+        );
+
+        req.user = {
+            id: decoded.id,
+        };
+
+        next();
+
+    } catch (error) {
+        if (error.name === "TokenExpiredError") {
+            return res.status(401).json({
+                status: "fail",
+                message: "Token expired"
+            });
+        }
+
+        return res.status(403).json({
+            status: "fail",
+            message: "Invalid token"
+        });
     }
-
-    if (!token) {
-      return res.status(401).json({
-        status: "fail",
-        message: "Authorization token missing"
-      });
-    }
-
-    // Verify token (SYNC, CLEAN)
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET_STRING
-    );
-
-    // Attach user info to request
-    req.user = {
-      id: decoded.id,
-    };
-
-    next();
-
-  } catch (error) {
-
-    if (error.name === "TokenExpiredError") {
-      return res.status(401).json({
-        status: "fail",
-        message: "Token expired"
-      });
-    }
-
-    return res.status(403).json({
-      status: "fail",
-      message: "Invalid token"
-    });
-  }
 };
 
 
+//  Bug #10 FIXED: Decode refresh token JWT to get user ID instead of requiring email in body
 exports.refreshToken = async(req,res)=>{
     try {
-        const org = await OrgModel.findOne({companyEmail : req.body.email});
         const refreshToken = req.headers["refresh-token"];
 
-        const decodeToken = jwt.verify(refreshToken,process.env.JWT_SECRET_STRING);
+        if (!refreshToken) {
+            return res.status(400).json({
+                status: "fail",
+                message: "Refresh token is required"
+            });
+        }
+
+        const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET_STRING);
+
+        // Use the user ID from the decoded refresh token — no need for email
+        const org = await OrgModel.findById(decoded.id);
+        if (!org) {
+            return res.status(404).json({
+                status: "fail",
+                message: "Organization not found"
+            });
+        }
 
         const token = jwtToken(org._id);
 
         return res.status(200).json({
             status : "success",
-            token : {
-                accessToken : token.accessToken,
-                refreshToken : token.refreshToken
-            }
+            accessToken : token.accessToken,
+            refreshToken : token.refreshToken
         })
-    
+
     } catch (err) {
         if(err.name === "TokenExpiredError"){
             return res.status(401).json({
                 status : "fail",
                 message : "Refresh Token Expired, Login Again"
             })
-            }
+        }
         return res.status(403).json({
             status : "fail",
             message : "Invalid Token"
@@ -92,17 +102,22 @@ exports.refreshToken = async(req,res)=>{
     }
 }
 
+//  Bug #5 FIXED: Strip password hash before sending to client
 exports.registerCompany = async (req,res)=>{
     try {
         const registeredCompany = await OrgModel.create(req.body);
         const {accessToken,refreshToken} = jwtToken(registeredCompany._id);
         if(registeredCompany){
+            // Strip password hash before sending to client
+            const orgData = registeredCompany.toObject();
+            delete orgData.password;
+
             res.status(201).json({
                 status : "success",
                 message : "Company Registered Successfully",
                 accessToken,
                 refreshToken,
-                organization : registeredCompany
+                organization : orgData
             })
         }else{
             res.status(400).json({
@@ -118,29 +133,36 @@ exports.registerCompany = async (req,res)=>{
     }
 }
 
+//  Bug #1 FIXED: Changed `email` to `companyEmail` to match frontend payload
+//  Bug #4 FIXED: Strip password hash before sending to client
 exports.login = async(req,res)=>{
     try {
-        const {email,password} = req.body;
-        const organization = await OrgModel.findOne({companyEmail : email}).select("+password");
+        const {companyEmail, password} = req.body;
+        const organization = await OrgModel.findOne({companyEmail}).select("+password");
         if(!organization){
             return res.status(400).json({
                 status : "fail",
-                message : "Invald Email"
+                message : "Invalid Email"
             })
         }
-        const passwordVerification = await bcrypt.compare(password,organization.password);
+        const passwordVerification = await bcrypt.compare(password, organization.password);
         if(!passwordVerification){
             return res.status(400).json({
                 status : "fail",
-                message : "Invald password"
+                message : "Invalid password"
             })
         }
         const {accessToken,refreshToken} = jwtToken(organization._id);
+
+        // Strip password hash before sending to client
+        const orgData = organization.toObject();
+        delete orgData.password;
+
         return res.status(200).json({
             status : "success",
             accessToken,
             refreshToken,
-            organization
+            organization: orgData
         })
     } catch (error) {
         res.status(400).json({
@@ -151,63 +173,54 @@ exports.login = async(req,res)=>{
 }
 
 exports.getDashboardOverview = async (req, res) => {
-  try {
-    const organizationId = req.user.id;
+    try {
+        const organizationId = req.user.id;
 
-    // Optional date filter
-    const dateFilter = {};
-    const { from, to } = req.query;
+        const dateFilter = {};
+        const { from, to } = req.query;
 
-    if (from && to) {
-      dateFilter.createdAt = {
-        $gte: new Date(from),
-        $lte: new Date(to),
-      };
+        if (from && to) {
+            dateFilter.createdAt = {
+                $gte: new Date(from),
+                $lte: new Date(to),
+            };
+        }
+
+        const totalInterviews = await Interview.countDocuments({
+            organizationId,
+            ...dateFilter,
+        });
+
+        const activeInterviews = await Interview.countDocuments({
+            organizationId,
+            scheduledAt: { $gte: new Date() },
+        });
+
+        const totalCandidatesAttempted = await Result.countDocuments({
+            organizationId,
+            ...dateFilter,
+        });
+
+        const shortlistedCandidates = await Result.countDocuments({
+            organizationId,
+            status: "shortlisted",
+            ...dateFilter,
+        });
+
+        return res.status(200).json({
+            status: "success",
+            data: {
+                totalInterviews,
+                activeInterviews,
+                totalCandidatesAttempted,
+                shortlistedCandidates,
+            },
+        });
+    } catch (error) {
+        console.error("Dashboard Overview Error:", error);
+        return res.status(500).json({
+            status: "fail",
+            message: error.message,
+        });
     }
-
-    // ---- INTERVIEW METRICS ----
-
-    // Total interviews created
-    const totalInterviews = await Interview.countDocuments({
-      organizationId,
-      ...dateFilter,
-    });
-
-    // Active interviews (scheduled in future)
-    const activeInterviews = await Interview.countDocuments({
-      organizationId,
-      scheduledAt: { $gte: new Date() },
-    });
-
-    // ---- CANDIDATE METRICS ----
-
-    // Total candidates attempted (1 result = 1 attempt)
-    const totalCandidatesAttempted = await Result.countDocuments({
-      organizationId,
-      ...dateFilter,
-    });
-
-    // Shortlisted candidates
-    const shortlistedCandidates = await Result.countDocuments({
-      organizationId,
-      status: "shortlisted",
-      ...dateFilter,
-    });
-
-    return res.status(200).json({
-      status: "success",
-      data: {
-        totalInterviews,
-        activeInterviews,
-        totalCandidatesAttempted,
-        shortlistedCandidates,
-      },
-    });
-  } catch (error) {
-    console.error("Dashboard Overview Error:", error);
-    return res.status(500).json({
-      status: "fail",
-      message: error.message,
-    });
-  }
 };
