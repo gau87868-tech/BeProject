@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CompanyAuthContext } from "../../context/CompanyAuthContext";
 import fetchFunction from "../../utils/fetchFunction";
-import { INTERVIEW_RESULT_URL } from "../../utils/constants";
+import { INTERVIEW_RESULT_URL, INTERVIEW_SHORTLIST_URL } from "../../utils/constants";
 import {
   ArrowLeft,
   User,
@@ -20,6 +20,7 @@ import {
   Briefcase,
   Star,
   AlertCircle,
+  StarOff,
 } from "lucide-react";
 
 export default function CandidateReport() {
@@ -30,6 +31,7 @@ export default function CandidateReport() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [shortlisting, setShortlisting] = useState(false);
 
   useEffect(() => {
     fetchResult();
@@ -48,6 +50,27 @@ export default function CandidateReport() {
     setLoading(false);
   };
 
+  // ── Shortlist toggle ──────────────────────────────────────
+  const isShortlisted = result?.status === "SHORTLISTED";
+
+  const handleShortlistToggle = async () => {
+    setShortlisting(true);
+    setError("");
+
+    const res = await fetchFunction({
+      apiUrl: `${INTERVIEW_SHORTLIST_URL}/${resultId}`,
+      crudMethod: "PATCH",
+      postData: { shortlisted: !isShortlisted },
+      setError,
+    });
+
+    if (res?.status === "success" && res.data) {
+      setResult((prev) => ({ ...prev, status: res.data.status, shortlistedAt: res.data.shortlistedAt }));
+    }
+    setShortlisting(false);
+  };
+
+  // ── Helpers ────────────────────────────────────────────────
   const getScoreGrade = (score) => {
     if (score >= 90) return { grade: "A+", color: "text-green-600", bg: "bg-green-50", ring: "ring-green-200" };
     if (score >= 80) return { grade: "A", color: "text-green-600", bg: "bg-green-50", ring: "ring-green-200" };
@@ -72,9 +95,10 @@ export default function CandidateReport() {
     }
   };
 
+  // ── Loading / Not Found ───────────────────────────────────
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
       </div>
     );
@@ -82,13 +106,13 @@ export default function CandidateReport() {
 
   if (!result) {
     return (
-      <div className="text-center py-12">
-        <AlertCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">Result not found</h3>
-        <p className="text-gray-500 mb-4">The requested result could not be loaded.</p>
+      <div className="text-center py-20">
+        <AlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-gray-600">Result not found</h3>
+        <p className="text-gray-400 mt-1">The requested result could not be loaded.</p>
         <button
           onClick={() => navigate(-1)}
-          className="text-indigo-600 font-medium hover:underline"
+          className="text-indigo-600 font-medium hover:underline mt-4 inline-block"
         >
           Go Back
         </button>
@@ -99,167 +123,185 @@ export default function CandidateReport() {
   const scoreGrade = getScoreGrade(result.aiScore || 0);
   const recStyle = getRecommendationStyle(result.recommendation);
 
+  // ── Render ────────────────────────────────────────────────
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto space-y-6">
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition"
       >
-        <ArrowLeft className="w-5 h-5" /> Back to Results
+        <ArrowLeft className="w-4 h-4" />
+        Back to Results
       </button>
 
       {/* Candidate Header Card */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl p-6 shadow-sm border border-gray-100"
+        className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
       >
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center">
-              <User className="w-8 h-8 text-indigo-600" />
+        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
+          <div className="flex items-center gap-5">
+            {/* Avatar */}
+            <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center text-white text-2xl font-bold">
+              {(result.candidateId?.name?.[0] || result.candidateId?.email?.[0] || "?").toUpperCase()}
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-800">
+              <h2 className="text-2xl font-bold text-white">
                 {result.candidateId?.name || "Anonymous Candidate"}
-              </h1>
-              <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-500">
-                {result.candidateId?.email && (
-                  <span className="flex items-center gap-1">
-                    <Mail className="w-4 h-4" /> {result.candidateId.email}
-                  </span>
-                )}
-                {result.interviewId?.title && (
-                  <span className="flex items-center gap-1">
-                    <Briefcase className="w-4 h-4" /> {result.interviewId.title}
-                  </span>
-                )}
-                {result.completedAt && (
-                  <span className="flex items-center gap-1">
-                    <Calendar className="w-4 h-4" />
-                    {new Date(result.completedAt).toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </span>
-                )}
-              </div>
+              </h2>
+              {result.candidateId?.email && (
+                <p className="text-indigo-200 flex items-center gap-1.5 mt-1">
+                  <Mail className="w-4 h-4" />
+                  {result.candidateId.email}
+                </p>
+              )}
+              {result.interviewId?.title && (
+                <p className="text-indigo-200 flex items-center gap-1.5 mt-0.5">
+                  <Briefcase className="w-4 h-4" />
+                  {result.interviewId.title}
+                </p>
+              )}
+              {result.completedAt && (
+                <p className="text-indigo-200 flex items-center gap-1.5 mt-0.5">
+                  <Calendar className="w-4 h-4" />
+                  {new Date(result.completedAt).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </p>
+              )}
             </div>
           </div>
+        </div>
 
-          {/* Score Badge */}
-          <div className={`flex flex-col items-center p-4 rounded-xl ${scoreGrade.bg} ring-2 ${scoreGrade.ring}`}>
-            <p className={`text-3xl font-bold ${scoreGrade.color}`}>
+        {/* Score Badge */}
+        <div className="flex items-center justify-center -mt-6">
+          <div className={`${scoreGrade.bg} ${scoreGrade.ring} ring-4 rounded-2xl px-8 py-4 text-center shadow-lg`}>
+            <div className={`text-4xl font-bold ${scoreGrade.color}`}>
               {result.aiScore != null ? `${result.aiScore}%` : "N/A"}
-            </p>
-            <p className={`text-sm font-medium ${scoreGrade.color}`}>Grade: {scoreGrade.grade}</p>
+            </div>
+            <div className="text-sm text-gray-500 mt-1">Grade: {scoreGrade.grade}</div>
           </div>
         </div>
       </motion.div>
 
       {/* Recommendation */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className={`rounded-xl p-6 border ${recStyle.bg} ${recStyle.border}`}
+        className={`${recStyle.bg} ${recStyle.border} border rounded-xl p-6 text-center`}
       >
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">{recStyle.icon}</span>
-          <div>
-            <p className={`text-lg font-bold ${recStyle.text}`}>
-              {result.recommendation || "Pending Evaluation"}
-            </p>
-            <p className={`text-sm ${recStyle.text} opacity-80`}>
-              AI Recommendation
-            </p>
-          </div>
-        </div>
+        <span className="text-3xl">{recStyle.icon}</span>
+        <h3 className={`text-xl font-bold ${recStyle.text} mt-2`}>
+          {result.recommendation || "Pending Evaluation"}
+        </h3>
+        <p className="text-sm text-gray-500 mt-1">AI Recommendation</p>
       </motion.div>
 
-      {/* Strengths & Weaknesses */}
-      <div className="grid md:grid-cols-2 gap-4">
-        {/* Strengths */}
+      {/* Shortlisted Banner (if shortlisted) */}
+      {isShortlisted && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-xl p-6 shadow-sm border border-gray-100"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-3"
         >
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-green-600" />
+          <Star className="w-5 h-5 text-amber-500 fill-amber-500 flex-shrink-0" />
+          <div>
+            <p className="text-amber-800 font-semibold text-sm">Shortlisted Candidate</p>
+            {result.shortlistedAt && (
+              <p className="text-amber-600 text-xs mt-0.5">
+                Shortlisted on{" "}
+                {new Date(result.shortlistedAt).toLocaleDateString("en-US", {
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </p>
+            )}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Strengths & Weaknesses */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="grid md:grid-cols-2 gap-6"
+      >
+        {/* Strengths */}
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h3 className="flex items-center gap-2 text-lg font-semibold text-green-700 mb-4">
+            <TrendingUp className="w-5 h-5" />
             Strengths
           </h3>
           {result.strengths?.length > 0 ? (
             <ul className="space-y-2">
               {result.strengths.map((s, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">{s}</span>
+                <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span>{s}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-gray-500 text-sm">No strengths data available yet.</p>
+            <p className="text-sm text-gray-400">No strengths data available yet.</p>
           )}
-        </motion.div>
+        </div>
 
         {/* Weaknesses */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
-          className="bg-white rounded-xl p-6 shadow-sm border border-gray-100"
-        >
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <TrendingDown className="w-5 h-5 text-red-500" />
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h3 className="flex items-center gap-2 text-lg font-semibold text-red-700 mb-4">
+            <TrendingDown className="w-5 h-5" />
             Areas for Improvement
           </h3>
           {result.weaknesses?.length > 0 ? (
             <ul className="space-y-2">
               {result.weaknesses.map((w, i) => (
-                <li key={i} className="flex items-start gap-2">
-                  <XCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                  <span className="text-gray-700">{w}</span>
+                <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                  <XCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
+                  <span>{w}</span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="text-gray-500 text-sm">No improvement areas data available yet.</p>
+            <p className="text-sm text-gray-400">No improvement areas data available yet.</p>
           )}
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
 
       {/* Answers Section */}
       {result.answers?.length > 0 && (
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="bg-white rounded-xl p-6 shadow-sm border border-gray-100"
+          className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
         >
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-indigo-600" />
-            Interview Answers ({result.answers.length})
-          </h3>
-          <div className="space-y-4">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-indigo-500" />
+              Interview Answers ({result.answers.length})
+            </h3>
+          </div>
+          <div className="divide-y divide-gray-100">
             {result.answers.map((ans, i) => (
-              <div key={i} className="p-4 bg-gray-50 rounded-lg">
+              <div key={i} className="px-6 py-4">
                 <div className="flex items-start gap-3">
-                  <span className="flex-shrink-0 w-7 h-7 bg-indigo-100 text-indigo-700 rounded-full flex items-center justify-center text-xs font-bold">
+                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold">
                     {i + 1}
                   </span>
                   <div className="flex-1">
-                    <p className="font-medium text-gray-800 mb-2">
+                    <p className="font-medium text-gray-800">
                       {ans.questionText || ans.questionId?.questionText || `Question ${i + 1}`}
                     </p>
-                    <div className="bg-white p-3 rounded-lg border border-gray-200">
-                      <p className="text-gray-700 text-sm leading-relaxed">
-                        {ans.answerText || "No answer provided"}
-                      </p>
-                    </div>
+                    <p className="mt-2 text-sm text-gray-600 bg-gray-50 rounded-lg p-3">
+                      {ans.answerText || "No answer provided"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -269,27 +311,50 @@ export default function CandidateReport() {
       )}
 
       {/* Status Badge */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35 }}
-        className="flex justify-center">
-        <span
-          className={`px-4 py-2 rounded-full text-sm font-medium ${
-            result.status === "EVALUATED"
-              ? "bg-green-100 text-green-700"
-              : result.status === "SUBMITTED"
-              ? "bg-blue-100 text-blue-700"
-              : "bg-yellow-100 text-yellow-700"
-          }`}
-        >
+      <div className="flex justify-center">
+        <span className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">
           Status: {result.status || "Unknown"}
         </span>
+      </div>
+
+      {/* ── Shortlist Action Button ───────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4 }}
+        className="flex justify-center pt-2 pb-4"
+      >
+        <button
+          onClick={handleShortlistToggle}
+          disabled={shortlisting}
+          className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed ${
+            isShortlisted
+              ? "bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200"
+              : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-indigo-200"
+          }`}
+        >
+          {shortlisting ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              {isShortlisted ? "Removing…" : "Shortlisting…"}
+            </>
+          ) : isShortlisted ? (
+            <>
+              <StarOff className="w-4 h-4" />
+              Remove from Shortlist
+            </>
+          ) : (
+            <>
+              <Star className="w-4 h-4" />
+              Mark as Shortlisted
+            </>
+          )}
+        </button>
       </motion.div>
 
       {/* Error display */}
       {error && (
-        <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm">
+        <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">
           {error}
         </div>
       )}

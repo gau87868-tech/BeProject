@@ -49,7 +49,7 @@ const interviewResultSchema = new mongoose.Schema(
     },
 
     aiScore: {
-      type: Number, 
+      type: Number,
       min: 0,
       max: 100,
     },
@@ -71,9 +71,13 @@ const interviewResultSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: ["STARTED", "SUBMITTED", "EVALUATED"],
+      enum: ["STARTED", "SUBMITTED", "EVALUATED", "SHORTLISTED"],
       default: "SUBMITTED",
       index: true
+    },
+
+    shortlistedAt: {
+      type: Date
     },
 
     completedAt: {

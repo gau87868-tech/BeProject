@@ -23,6 +23,7 @@ import InterviewDetail from "./components/Interviews/InterviewDetail";
 import InviteCandidates from "./components/Interviews/InviteCandidates";
 import InterviewResults from "./components/Results/InterviewResults";
 import CandidateReport from "./components/Results/CandidateReport";
+import InterviewAnalytics from "./components/Results/InterviewAnalytics"; // NEW
 import CompanySettings from "./components/Settings/CompanySettings";
 
 // Protected Route wrapper
@@ -56,6 +57,7 @@ export default function App() {
           <Route path="interviews/:id" element={<InterviewDetail />} />
           <Route path="interviews/:id/invite" element={<InviteCandidates />} />
           <Route path="interviews/:id/results" element={<InterviewResults />} />
+          <Route path="interviews/:id/analytics" element={<InterviewAnalytics />} />
           <Route path="results/:resultId" element={<CandidateReport />} />
           <Route path="settings" element={<CompanySettings />} />
         </Route>

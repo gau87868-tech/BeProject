@@ -12,10 +12,6 @@ const router = express.Router();
  */
 router.post("/register", validateOrgSignup, orgController.registerCompany);
 
-//debug
-// console.log("Exports:", Object.keys(orgController));
-// console.log("registerCompany type:", typeof orgController.registerCompany);
-
 /**
  * @route POST /api/v2/organization/login
  * @desc Login organization
@@ -34,8 +30,27 @@ router.post("/refresh-token", orgController.refreshToken);
  * @route GET /api/v2/organization/dashboard/overview
  * @desc Get organization dashboard stats
  * @access Private
+ *
+ * FIX: Now uses validateOrgToken middleware (consistent with all other routes)
+ * instead of orgController.validateToken. This ensures req.organization.id
+ * is set correctly for the controller.
  */
-// ✅ Bug #11 FIXED: Removed :organizationId param — controller uses req.user.id from JWT
-router.get("/dashboard/overview", orgController.validateToken, orgController.getDashboardOverview);
+router.get("/dashboard/overview", validateOrgToken, orgController.getDashboardOverview);
+
+/**
+ * @route PATCH /api/v2/organization/profile
+ * @desc Update organization profile
+ * @access Private
+ * NEW ENDPOINT
+ */
+router.patch("/profile", validateOrgToken, orgController.updateProfile);
+
+/**
+ * @route PATCH /api/v2/organization/password
+ * @desc Change organization password
+ * @access Private
+ * NEW ENDPOINT
+ */
+router.patch("/password", validateOrgToken, orgController.changePassword);
 
 module.exports = router;

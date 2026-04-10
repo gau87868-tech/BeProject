@@ -1,20 +1,26 @@
 const mongoose = require('mongoose');
 
 const questionItemSchema = new mongoose.Schema({
-  questionText: {
+    questionText: {
         type: String,
         required: [true, "Question text is required"],
         trim: true
-  },
-  type: {
-      type: String,
-      enum: ["technical", "behavioral", "coding", "hr"],
-      default: "technical"
+    },
+    type: {
+        type: String,
+        enum: ["technical", "behavioral", "coding", "hr"],
+        default: "technical"
     },
     difficulty: {
         type: String,
         enum: ["easy", "medium", "hard"],
         default: "medium"
+    },
+    timeLimit: {
+        type: Number,
+        min: [10, "Time limit must be at least 10 seconds"],
+        max: [600, "Time limit cannot exceed 600 seconds"],
+        default: 120
     }
 }, { _id: true });
 
