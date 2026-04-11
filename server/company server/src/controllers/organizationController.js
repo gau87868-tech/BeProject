@@ -313,7 +313,8 @@ exports.changePassword = async (req, res) => {
 
     // Hash and save new password directly (bypass the pre-save hook
     // to avoid any double-hashing edge cases)
-    org.password = await bcrypt.hash(newPassword, 12);
+    
+    org.password = newPassword;
     org.updatedAt = new Date();
     await org.save({ validateBeforeSave: false });
 

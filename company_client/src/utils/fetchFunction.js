@@ -33,7 +33,7 @@ export default async function fetchFunction({
     if (response.status !== 401) {
       const result = await response.json();
       if (!response.ok) {
-        setError?.(result?.message || "Something went wrong");
+        setError?.(result?.message || result?.error || "Something went wrong");
       }
       return result;
     }
@@ -91,7 +91,7 @@ export default async function fetchFunction({
 
     const retryResult = await retryResponse.json();
     if (!retryResponse.ok) {
-      setError?.(retryResult?.message || "Something went wrong");
+      setError?.(retryResult?.message  || retryResult?.error|| "Something went wrong");
     }
     return retryResult;
   } catch (error) {
